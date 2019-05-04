@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <title>PhoneGap Accelerometer Test</title>
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="buttons.css" />
+    <style>
+    body {margin:0px;font-size:large;}
+    .hidden {visibility:collapse;display:none;}
+    .expose {visibility:visible;display:block;}
+    .copyright {padding:5px;align:left;font-style:italic;font-size:small;}
+    #header {margin:0;padding:0;}
+    #exitApp {margin:0.1em;float:right;}
+    #clearWatch {margin:0.1em;}
+    </style>
+    <script type="text/javascript" charset="utf-8" src="fastclick.js"></script>
+    <script type="text/javascript">
+    var gWatchID = null;
+    var gOptions = { frequency: 100 };  // Update every 3 seconds
+    //
+    // Wait for PhoneGap to load
+    document.addEventListener("deviceready", onDeviceReady, false);
+    //
+    function accelClear() {
+        document.getElementById('accelX').innerHTML = '&nbsp;';
+        document.getElementById('accelY').innerHTML = '&nbsp;';
+        document.getElementById('accelZ').innerHTML = '&nbsp;';
+        document.getElementById('timestamp').innerHTML = '&nbsp;';
+    }
+    function accelUpdate(acceleration) {
+        document.getElementById('accelX').innerHTML = acceleration.x;
+        document.getElementById('accelY').innerHTML = acceleration.y;
+        document.getElementById('accelZ').innerHTML = acceleration.z;
+        document.getElementById('timestamp').innerHTML = acceleration.timestamp;
+    }
+    function accelOff() {
+        navigator.accelerometer.clearWatch(gWatchID);
+    }
+
+    //
+    function onDeviceReady() {
+        // hide Exit button. They don't have one on iOS devices.
+        if (device.platform === "iOS") {
+            //alert("got iOS:" + device.platform);
+            // http://www.mzcart.com/javascript-how-to-addremove-css-class-from-a-dom-element/
+            document.getElementById('exitApp').classList.add("hidden");
+            /* deals with post iOS 7 change that cover the status bar */
+            /* http://coenraets.org/blog/2013/09/phonegap-and-cordova-with-ios-7/ */
+            document.body.style.marginTop = "20px";
+        } else if (device.platform == 'Android') {
+            // Get rid of 300ms delay 
+            document.addEventListener('DOMContentLoaded', function() { FastClick.attach(document.body); }, false);
+        }
+        navigator.accelerometer.getCurrentAcceleration(accelUpdate, function() {alert("Error on getCurrentAccel");});
+        gWatchID = navigator.accelerometer.watchAcceleration(accelUpdate,
+                function() {
+                    alert("Error on watchAccel");
+                },
+                gOptions);
+    }
+    //
+    function onLoad() {
+        accelClear();
+    }
+
+Accelerometer    </script>
+</head>
+<body onload="onLoad()">
+<div id=header class="button button-block button-large">
+    <img align=left src=icon.png>
+    Phonegap Accelerometer Test
+</div>
+<p />&nbsp;<p />
+<button id=clearWatch onclick='accelOff()' class="button button-pill button-primary button-large">Clear Watch</button>
+
+<button id=exitApp onclick='navigator.app.exitApp()' class="button button-pill button-primary button-large">Exit</button>
+
+<div id=ax class="button button-block button-action button-large" style="margin:1em;">X <span id=accelX></span></div>
+
+<div id=ay class="button button-block button-action button-large" style="margin:1em;">Y <span id=accelY></span></div>
+
+<div id=az class="button button-block button-action button-large" style="margin:1em;">Z <span id=accelZ></span></div>
+
+<div id=ts class="button button-block button-primary button-large" style="margin:1em;">TS <span id=timestamp></span></div>
+
+<div class="copyright" style="padding:5px;align:left;font-style:italic;font-size:small;">
+    <span id=copyright>Created by Jesus Monroy, Jr. &copy; 2015</span>
+</div>
+</body>
+</html>
